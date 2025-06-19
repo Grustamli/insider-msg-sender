@@ -57,6 +57,9 @@ func run() error {
 	}
 
 	msgSenderDaemon := initMessageSenderDaemon(app, log)
+	if err := msgSenderDaemon.Start(ctx); err != nil {
+		return err
+	}
 	srv := initAPIServer(app, msgSenderDaemon)
 	return srv.Run()
 }
@@ -92,7 +95,7 @@ func initDB(cfg *config.AppConfig) (*sql.DB, error) {
 	return db, nil
 }
 
-func initMessageSender(cfg *config.AppConfig) (*webhook.WebhookSender, error) {
+func initMessageSender(cfg *config.AppConfig) (*webhook.MessageSender, error) {
 	client := initHTTPClient(&cfg.Webhook)
 	ret, err := webhook.NewWebhookSender(client, cfg.Webhook.URL, buildWebhookOpts(&cfg.Webhook)...)
 	if err != nil {
@@ -101,8 +104,8 @@ func initMessageSender(cfg *config.AppConfig) (*webhook.WebhookSender, error) {
 	return ret, nil
 }
 
-func buildWebhookOpts(cfg *config.WebhookConfig) []webhook.WebhookSenderOptFunc {
-	var ret []webhook.WebhookSenderOptFunc
+func buildWebhookOpts(cfg *config.WebhookConfig) []webhook.OptFunc {
+	var ret []webhook.OptFunc
 
 	if cfg.CharacterLimit > 0 {
 		ret = append(ret, webhook.WithCharacterLimit(cfg.CharacterLimit))
