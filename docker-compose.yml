@@ -13,6 +13,7 @@ services:
       - WEBHOOK_CHARACTER_LIMIT=160
       - WEBHOOK_TIMEOUT_SECONDS=20
       - SEND_INTERVAL_SECONDS=120
+      - MESSAGE_COUNT_PER_INTERVAL=2
       - REDIS_ADDRESS=redis:6379
       - REDIS_CACHE_KEY=messages
       - POSTGRES_DB_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable

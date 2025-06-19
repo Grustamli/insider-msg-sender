@@ -16,12 +16,13 @@ const (
 )
 
 type AppConfig struct {
-	Environment         Environment    `env:"ENVIRONMENT,default=DEV"`
-	LogLevel            string         `env:"LOG_LEVEL,default=DEBUG"`
-	SendIntervalSeconds int            `env:"SEND_INTERVAL_SECONDS,default=120"`
-	Postgres            PostgresConfig `env:", prefix=POSTGRES_"`
-	Webhook             WebhookConfig  `env:", prefix=WEBHOOK_"`
-	Redis               RedisConfig    `env:", prefix=REDIS_"`
+	Environment             Environment    `env:"ENVIRONMENT, default=DEV"`
+	LogLevel                string         `env:"LOG_LEVEL, default=DEBUG"`
+	SendIntervalSeconds     int            `env:"SEND_INTERVAL_SECONDS, default=120"`
+	MessageCountPerInterval int            `env:"MESSAGE_COUNT_PER_INTERVAL, default=2"`
+	Postgres                PostgresConfig `env:", prefix=POSTGRES_"`
+	Webhook                 WebhookConfig  `env:", prefix=WEBHOOK_"`
+	Redis                   RedisConfig    `env:", prefix=REDIS_"`
 }
 
 type WebhookConfig struct {

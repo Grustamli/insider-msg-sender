@@ -123,7 +123,12 @@ func initHTTPClient(cfg *config.WebhookConfig) *http.Client {
 
 func initMessageSenderDaemon(cfg *config.AppConfig, app application.App, logger zerolog.Logger) *daemon.TimerDaemon {
 	return daemon.NewTimerDaemon("MessageSender", func(ctx context.Context) error {
-		return app.SendNext(ctx)
+		for i := 0; i < cfg.MessageCountPerInterval; i++ {
+			if err := app.SendNext(ctx); err != nil {
+				return err
+			}
+		}
+		return nil
 	}, time.Duration(cfg.SendIntervalSeconds)*time.Second, &logger)
 }
 
