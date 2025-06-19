@@ -15,6 +15,7 @@ type Daemon interface {
 }
 
 type TimerDaemon struct {
+	jobName string
 	job     ScheduledJobFunc
 	period  time.Duration
 	stop    chan struct{}
@@ -25,11 +26,13 @@ type TimerDaemon struct {
 
 var _ Daemon = (*TimerDaemon)(nil) // Ensure TimerDaemon implements Daemon
 
-func NewTimerDaemon(job ScheduledJobFunc, period time.Duration) *TimerDaemon {
+func NewTimerDaemon(jobName string, job ScheduledJobFunc, period time.Duration, logger *zerolog.Logger) *TimerDaemon {
 	return &TimerDaemon{
-		job:    job,
-		period: period,
-		stop:   make(chan struct{}),
+		jobName: jobName,
+		job:     job,
+		period:  period,
+		stop:    make(chan struct{}),
+		logger:  logger,
 	}
 }
 
@@ -78,9 +81,11 @@ func (t *TimerDaemon) runJob(ctx context.Context) {
 		case <-ticker.C:
 			// Execute the job, but don't let it block the daemon
 			go func() {
+				t.logger.Debug().Msgf("running job: %s", t.jobName)
 				if err := t.job(ctx); err != nil {
-					t.logger.Error().Err(err).Msg("job failed")
+					t.logger.Error().Err(err).Msgf("job failed: %s", t.jobName)
 				}
+				t.logger.Debug().Msgf("finished job: %s", t.jobName)
 			}()
 		}
 	}
