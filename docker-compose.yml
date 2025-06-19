@@ -24,7 +24,7 @@ services:
         echo 'Seeding initial messages...' &&
         /bin/cli seed -c 10 &&
         echo 'Running periodic seeder...' &&
-        /bin/cli seed -c 2 -i 60
+        /bin/cli seed -c 1 -i 10
       "
     depends_on:
       - db
