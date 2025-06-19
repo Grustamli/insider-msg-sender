@@ -23,7 +23,7 @@ type MessageRepository interface {
 
 var cli struct {
 	Seed struct {
-		DBURL    string `help:"Postgres DSN (or set $DATABASE_URL)" env:"DATABASE_URL" name:"db-url"`
+		DBURL    string `help:"Postgres Database URL (or set $DATABASE_URL)" env:"DATABASE_URL" name:"db-url"`
 		Interval int    `short:"i" help:"Interval in seconds between seed runs. 0 = run once." default:"0"`
 		Count    int    `short:"c" help:"Number of messages to insert each run. Default is 1" default:"1"`
 	} `cmd help:"Seed the database with initial data."`
@@ -55,11 +55,10 @@ func run() error {
 }
 
 func runSeed() error {
-	dsn := cli.Seed.DBURL
-	if dsn == "" {
+	if cli.Seed.DBURL == "" {
 		return errors.New("no database URL provided: set --db-url or $DATABASE_URL")
 	}
-	messages, err := initMessageRepository(dsn)
+	messages, err := initMessageRepository(cli.Seed.DBURL)
 	logger := logging.New(logging.LogConfig{Level: logging.DEBUG})
 
 	if err != nil {
