@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"insider-message-sender/message"
+	"time"
 )
 
 type App interface {
@@ -31,6 +32,9 @@ func (a *Application) SendNext(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "getting next unsent message")
 	}
+	if msg == nil {
+		return nil
+	}
 	return a.sendMessage(ctx, msg)
 }
 
@@ -43,6 +47,7 @@ func (a *Application) SendAllUnsent(ctx context.Context) error {
 		if err := a.sendMessage(ctx, msg); err != nil {
 			return err
 		}
+		time.Sleep(time.Second)
 	}
 	return nil
 }
