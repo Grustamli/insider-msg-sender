@@ -56,7 +56,7 @@ func run() error {
 		return err
 	}
 
-	msgSenderDaemon := initMessageSenderDaemon(app, log)
+	msgSenderDaemon := initMessageSenderDaemon(cfg, app, log)
 	if err := msgSenderDaemon.Start(ctx); err != nil {
 		return err
 	}
@@ -121,10 +121,10 @@ func initHTTPClient(cfg *config.WebhookConfig) *http.Client {
 	return client
 }
 
-func initMessageSenderDaemon(app application.App, logger zerolog.Logger) *daemon.TimerDaemon {
+func initMessageSenderDaemon(cfg *config.AppConfig, app application.App, logger zerolog.Logger) *daemon.TimerDaemon {
 	return daemon.NewTimerDaemon("MessageSender", func(ctx context.Context) error {
 		return app.SendNext(ctx)
-	}, 2*time.Minute, &logger)
+	}, time.Duration(cfg.SendIntervalSeconds)*time.Second, &logger)
 }
 
 func initAPIServer(app application.App, msgSenderDaemon daemon.Daemon) *api.Server {
