@@ -102,6 +102,21 @@ func (q *Queries) GetNextUnsent(ctx context.Context) (GetNextUnsentRow, error) {
 	return i, err
 }
 
+const insertMessage = `-- name: InsertMessage :exec
+INSERT INTO message (recipient, content)
+VALUES ($1, $2)
+`
+
+type InsertMessageParams struct {
+	Recipient string
+	Content   string
+}
+
+func (q *Queries) InsertMessage(ctx context.Context, arg InsertMessageParams) error {
+	_, err := q.db.ExecContext(ctx, insertMessage, arg.Recipient, arg.Content)
+	return err
+}
+
 const setMessageSent = `-- name: SetMessageSent :exec
 UPDATE message
 SET message_id = $2,

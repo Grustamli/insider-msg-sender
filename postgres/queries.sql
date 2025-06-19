@@ -22,3 +22,7 @@ UPDATE message
 SET message_id = $2,
     sent_at    = $3
 WHERE id = $1;
+
+-- name: InsertMessage :exec
+INSERT INTO message (recipient, content)
+VALUES ($1, $2);

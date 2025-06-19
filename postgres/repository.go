@@ -77,6 +77,16 @@ func (m *MessageRepository) GetAllSent(ctx context.Context) ([]*message.SentMess
 	return sentMessagesFromRows(res)
 }
 
+func (m *MessageRepository) Insert(ctx context.Context, msg *message.Message) error {
+	if err := m.queries.InsertMessage(ctx, gen.InsertMessageParams{
+		Recipient: string(msg.To),
+		Content:   msg.Content,
+	}); err != nil {
+		return errors.Wrap(err, "inserting message")
+	}
+	return nil
+}
+
 func sentMessagesFromRows(res []gen.GetAllSentRow) ([]*message.SentMessage, error) {
 	ret := make([]*message.SentMessage, len(res))
 	for i, r := range res {
