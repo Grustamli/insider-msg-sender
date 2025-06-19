@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"insider-message-sender/message"
 	"io"
 	"net/http"
+	"time"
 )
 
 type OptFunc func(options *Options)
@@ -62,11 +64,27 @@ func NewWebhookSender(client *http.Client, webhookURL string, optFuncs ...OptFun
 	}, nil
 }
 
+type Response struct {
+	Message   string `json:"message"`
+	MessageID string `json:"messageId"`
+}
+
+func (r *Response) validate() error {
+	if r.Message != "Accepted" {
+		return fmt.Errorf("invalid message: %s", r.Message)
+	}
+	if r.MessageID == "" {
+		return fmt.Errorf("blank message id: %s", r.MessageID)
+	}
+	return nil
+}
+
 func (s *MessageSender) Send(ctx context.Context, msg *message.Message) (*message.SendResult, error) {
 	req, err := s.createRequest(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
+	sentTimestamp := time.Now()
 	resp, err := s.client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "sending request")
@@ -75,7 +93,17 @@ func (s *MessageSender) Send(ctx context.Context, msg *message.Message) (*messag
 	if resp.StatusCode != http.StatusAccepted {
 		return nil, errors.Errorf("sending request: received status %d", resp.StatusCode)
 	}
-	return s.buildSendResult(resp.Body)
+	res, err := s.parseResponse(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "parsing response")
+	}
+	if err := res.validate(); err != nil {
+		return nil, err
+	}
+	return &message.SendResult{
+		MessageID: res.MessageID,
+		SentAt:    sentTimestamp,
+	}, nil
 }
 
 func (s *MessageSender) createRequest(ctx context.Context, msg *message.Message) (*http.Request, error) {
@@ -100,12 +128,12 @@ func (s *MessageSender) setRequestHeaders(req *http.Request) {
 	req.Header.Set("Accept", "application/json")
 }
 
-func (s *MessageSender) buildSendResult(body io.ReadCloser) (*message.SendResult, error) {
-	var ret message.SendResult
-	if err := json.NewDecoder(body).Decode(&ret); err != nil {
+func (s *MessageSender) parseResponse(body io.ReadCloser) (*Response, error) {
+	var res Response
+	if err := json.NewDecoder(body).Decode(&res); err != nil {
 		return nil, errors.Wrap(err, "decoding response")
 	}
-	return &ret, nil
+	return &res, nil
 }
 
 func (s *MessageSender) payloadFromMessage(msg *message.Message) (*RequestPayload, error) {

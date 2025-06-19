@@ -48,7 +48,7 @@ func NewMessage(id string, to PhoneNumber, content string) (*Message, error) {
 }
 
 func (m *Message) SetSent(messageID string, sentAt time.Time) error {
-	if messageID != "" {
+	if messageID == "" {
 		return ErrBlankMessageID
 	}
 	if sentAt.IsZero() {
