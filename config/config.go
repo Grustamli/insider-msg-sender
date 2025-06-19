@@ -27,7 +27,7 @@ type WebhookConfig struct {
 	URL            string `env:"URL"`
 	AuthHeader     string `env:"AUTH_HEADER"`
 	AuthKey        string `env:"AUTH_KEY"`
-	CharacterLimit int    `env:"CHARACTER_LIMIT"`
+	CharacterLimit int    `env:"CHARACTER_LIMIT=160"` // typical character limit for SMS as default
 	TimeoutSeconds int    `env:"TIMEOUT_SECONDS, default=20"`
 }
 
@@ -38,7 +38,7 @@ type PostgresConfig struct {
 type RedisConfig struct {
 	Address  string `env:"ADDRESS, default=localhost:6379"`
 	DB       int    `env:"DB, default=0"`
-	CacheKey string `env:"CACHE_KEY, default="`
+	CacheKey string `env:"CACHE_KEY, default=messages"`
 }
 
 func (c *AppConfig) IsProduction() bool {
