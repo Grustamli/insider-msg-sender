@@ -27,7 +27,7 @@ type WebhookConfig struct {
 	URL            string `env:"URL"`
 	AuthHeader     string `env:"AUTH_HEADER"`
 	AuthKey        string `env:"AUTH_KEY"`
-	CharacterLimit int    `env:"CHARACTER_LIMIT=160"` // typical character limit for SMS as default
+	CharacterLimit int    `env:"CHARACTER_LIMIT, default=160"` // typical character limit for SMS as default
 	TimeoutSeconds int    `env:"TIMEOUT_SECONDS, default=20"`
 }
 
