@@ -19,6 +19,17 @@ services:
       - POSTGRES_PASS=${DB_PASSWORD}
       - REDIS_ADDRESS=redis:6379
       - REDIS_CACHE_KEY=messages
+  seeder:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
+    command: >
+      sh -c "
+        echo 'Seeding initial messages...' &&
+        /bin/cli seed -c 10 &&
+        echo 'Running periodic seeder...' &&
+        /bin/cli seed -c 2 -i 60
+      "
   db:
     image: postgres:16.9-alpine3.22
     restart: unless-stopped
