@@ -32,17 +32,13 @@ type WebhookConfig struct {
 }
 
 type PostgresConfig struct {
-	Host string `env:"HOST, default=localhost"`
-	Port int    `env:"PORT, default=5432"`
-	DB   string `env:"DB, default=postgres"`
-	User string `env:"USER,default=postgres"`
-	Pass string `env:"PASS"`
+	DBURL string `env:"DB_URL, required"`
 }
 
 type RedisConfig struct {
-	Address   string `env:"ADDRESS, default=localhost:6379"`
-	DB        int    `env:"DB, default=0"`
-	CACHE_KEY string `env:"CACHE_KEY, default="`
+	Address  string `env:"ADDRESS, default=localhost:6379"`
+	DB       int    `env:"DB, default=0"`
+	CacheKey string `env:"CACHE_KEY, default="`
 }
 
 func (c *AppConfig) IsProduction() bool {

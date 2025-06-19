@@ -79,16 +79,13 @@ func initMessageRepository(cfg *config.AppConfig) (message.Repository, error) {
 		DB:   cfg.Redis.DB,
 	})
 
-	return redisint.NewCacheRepository(rdb, cfg.Redis.CACHE_KEY,
+	return redisint.NewCacheRepository(rdb, cfg.Redis.CacheKey,
 		postgres.NewMessageRepository(gen.New(db)),
 	), nil
 }
 
 func initDB(cfg *config.AppConfig) (*sql.DB, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.User, cfg.Postgres.Pass, cfg.Postgres.DB)
-	fmt.Println(psqlInfo)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := sql.Open("postgres", cfg.Postgres.DBURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "connecting to postgres db")
 	}
