@@ -44,6 +44,7 @@ func (t *TimerDaemon) Start(ctx context.Context) error {
 		return nil
 	}
 
+	t.logger.Debug().Msgf("Starting daemon for: %s", t.jobName)
 	t.running = true
 
 	go t.runJob(ctx)
@@ -59,6 +60,7 @@ func (t *TimerDaemon) Stop(ctx context.Context) error {
 	}
 	close(t.stop)                // Signal the daemon to stop
 	t.stop = make(chan struct{}) // Reset the channel for future starts
+	t.logger.Debug().Msgf("Stopped daemon for: %s", t.jobName)
 	return nil
 }
 
