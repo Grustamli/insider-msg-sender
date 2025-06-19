@@ -1,0 +1,71 @@
+package config
+
+import (
+	"context"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+	"github.com/sethvargo/go-envconfig"
+	"strings"
+)
+
+type Environment string
+
+const (
+	Development Environment = "DEV"
+	Production  Environment = "PROD"
+)
+
+type AppConfig struct {
+	Environment Environment    `env:"ENVIRONMENT,default=DEV"`
+	LogLevel    string         `env:"LOG_LEVEL,default=DEBUG"`
+	Postgres    PostgresConfig `env:", prefix=POSTGRES_"`
+	Webhook     WebhookConfig  `env:", prefix=WEBHOOK_"`
+	Redis       RedisConfig    `env:", prefix=REDIS_"`
+}
+
+type WebhookConfig struct {
+	URL            string `env:"URL"`
+	AuthHeader     string `env:"AUTH_HEADER"`
+	AuthKey        string `env:"AUTH_KEY"`
+	CharacterLimit int    `env:"CHARACTER_LIMIT"`
+	TimeoutSeconds int    `env:"TIMEOUT_SECONDS, default=20"`
+}
+
+type PostgresConfig struct {
+	Host string `env:"HOST, default=localhost"`
+	Port int    `env:"PORT, default=5432"`
+	DB   string `env:"DB, default=postgres"`
+	User string `env:"USER,default=postgres"`
+	Pass string `env:"PASS"`
+}
+
+type RedisConfig struct {
+	Address   string `env:"ADDRESS, default=localhost:6379"`
+	DB        int    `env:"DB, default=0"`
+	CACHE_KEY string `env:"CACHE_KEY, default="`
+}
+
+func (c *AppConfig) IsProduction() bool {
+	return c.Environment == Production
+}
+
+func Load(ctx context.Context) (*AppConfig, error) {
+	ret := AppConfig{}
+	if err := envconfig.ProcessWith(ctx, &envconfig.Config{
+		Target: &ret,
+		Mutators: []envconfig.Mutator{
+			envconfig.MutatorFunc(trimConfigValue),
+		},
+	}); err != nil {
+		return nil, errors.Wrap(err, "load config")
+	}
+	return &ret, nil
+}
+
+func trimConfigValue(_ context.Context, _, _, _, resolvedValue string) (string, bool, error) {
+	return strings.TrimSpace(resolvedValue), false, nil
+}
+
+func (c *AppConfig) Log(l zerolog.Logger) {
+	l.Info().Interface("config", c).Msg("Config")
+}

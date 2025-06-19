@@ -1,0 +1,14 @@
+services:
+  dev-db:
+    image: postgres:16.9-alpine3.22
+    restart: unless-stopped
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+
+volumes:
+  db_data:

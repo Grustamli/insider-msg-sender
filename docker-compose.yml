@@ -1,0 +1,42 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - WEBHOOK_URL
+      - WEBHOOK_AUTH_HEADER
+      - WEBHOOK_AUTH_KEY
+      - WEBHOOK_CHARACTER_LIMIT
+      - WEBHOOK_TIMEOUT_SECONDS=20
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASS=${DB_PASSWORD}
+      - REDIS_ADDRESS=redis:6379
+      - REDIS_CACHE_KEY=messages
+  db:
+    image: postgres:16.9-alpine3.22
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+  migrator:
+    image: arigaio/atlas:latest-community-alpine
+    command: [ "migrate", "apply", "--dir", "file:///migrations", "--url", "postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable" ]
+    volumes:
+      - ./postgres/migrations:/migrations
+    depends_on:
+      - db
+  redis:
+    image: redis:8-alpine
+
+volumes:
+  db_data:
