@@ -3,6 +3,7 @@ module insider-message-sender
 go 1.24
 
 require (
+	github.com/alecthomas/kong v1.11.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/lib/pq v1.10.9
 	github.com/pkg/errors v0.9.1
@@ -12,6 +13,7 @@ require (
 )
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.2.1 // indirect
 	github.com/bytedance/sonic v1.13.3 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
