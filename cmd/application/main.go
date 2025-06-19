@@ -56,7 +56,7 @@ func run() error {
 		return err
 	}
 
-	msgSenderDaemon := initMessageSenderDaemon(app)
+	msgSenderDaemon := initMessageSenderDaemon(app, log)
 	srv := initAPIServer(app, msgSenderDaemon)
 	return srv.Run()
 }
@@ -121,10 +121,10 @@ func initHTTPClient(cfg *config.WebhookConfig) *http.Client {
 	return client
 }
 
-func initMessageSenderDaemon(app application.App) *daemon.TimerDaemon {
-	return daemon.NewTimerDaemon(func(ctx context.Context) error {
+func initMessageSenderDaemon(app application.App, logger zerolog.Logger) *daemon.TimerDaemon {
+	return daemon.NewTimerDaemon("MessageSender", func(ctx context.Context) error {
 		return app.SendNext(ctx)
-	}, 2*time.Minute)
+	}, 2*time.Minute, &logger)
 }
 
 func initAPIServer(app application.App, msgSenderDaemon daemon.Daemon) *api.Server {
