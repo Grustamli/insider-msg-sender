@@ -17,11 +17,16 @@ type Options struct {
 	headers        http.Header
 }
 
+func defaultOpts() *Options {
+	return &Options{
+		headers: make(http.Header),
+	}
+}
+
 type MessageSender struct {
-	client         *http.Client
-	url            string
-	characterLimit int
-	opts           *Options
+	client *http.Client
+	url    string
+	opts   *Options
 }
 
 var _ message.MessageSender = (*MessageSender)(nil)
@@ -44,7 +49,7 @@ type RequestPayload struct {
 }
 
 func NewWebhookSender(client *http.Client, webhookURL string, optFuncs ...OptFunc) (*MessageSender, error) {
-	opts := &Options{}
+	opts := defaultOpts()
 
 	for _, f := range optFuncs {
 		f(opts)
@@ -104,7 +109,7 @@ func (s *MessageSender) buildSendResult(body io.ReadCloser) (*message.SendResult
 }
 
 func (s *MessageSender) payloadFromMessage(msg *message.Message) (*RequestPayload, error) {
-	truncated, err := msg.TruncatedContent(s.characterLimit)
+	truncated, err := msg.TruncatedContent(s.opts.characterLimit)
 	if err != nil {
 		return nil, errors.Wrap(err, "truncating message")
 	}
