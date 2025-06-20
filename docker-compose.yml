@@ -1,36 +1,36 @@
 services:
-  #  app:
-  #    build: .
-  #    ports:
-  #      - "8000:8000"
-  #    depends_on:
-  #      - db
-  #      - redis
-  #    environment:
-  #      - WEBHOOK_URL
-  #      - WEBHOOK_AUTH_HEADER
-  #      - WEBHOOK_AUTH_KEY
-  #      - WEBHOOK_CHARACTER_LIMIT=160
-  #      - WEBHOOK_TIMEOUT_SECONDS=20
-  #      - SEND_INTERVAL_SECONDS=120
-  #      - MESSAGE_COUNT_PER_INTERVAL=2
-  #      - REDIS_ADDRESS=redis:6379
-  #      - REDIS_CACHE_KEY=messages
-  #      - POSTGRES_DB_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
-  #  seeder:
-  #    build: .
-  #    environment:
-  #      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
-  #    command: >
-  #      sh -c "
-  #        echo 'Seeding initial messages...' &&
-  #        /bin/cli seed -c 10 &&
-  #        echo 'Running periodic seeder...' &&
-  #        /bin/cli seed -c 1 -i 10
-  #      "
-  #    depends_on:
-  #      - db
-  #      - migrator
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - WEBHOOK_URL
+      - WEBHOOK_AUTH_HEADER
+      - WEBHOOK_AUTH_KEY
+      - WEBHOOK_CHARACTER_LIMIT=160
+      - WEBHOOK_TIMEOUT_SECONDS=20
+      - SEND_INTERVAL_SECONDS=120
+      - MESSAGE_COUNT_PER_INTERVAL=2
+      - REDIS_ADDRESS=redis:6379
+      - REDIS_CACHE_KEY=messages
+      - POSTGRES_DB_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
+  seeder:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
+    command: >
+      sh -c "
+        echo 'Seeding initial messages...' &&
+        /bin/cli seed -c 10 &&
+        echo 'Running periodic seeder...' &&
+        /bin/cli seed -c 1 -i 10
+      "
+    depends_on:
+      - db
+      - migrator
   db:
     image: postgres:16.9-alpine3.22
     restart: unless-stopped
