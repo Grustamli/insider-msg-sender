@@ -108,7 +108,7 @@ func createSeedMessages(count int) []*message.Message {
 	ret := make([]*message.Message, count)
 	for i := 0; i < count; i++ {
 		ret[i] = &message.Message{
-			To:      message.PhoneNumber(gofakeit.Numerify("+994#########")),
+			To:      gofakeit.Numerify("+994#########"),
 			Content: gofakeit.Sentence(6),
 		}
 	}

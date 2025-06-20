@@ -35,7 +35,7 @@ func (m *MessageRepository) GetNextUnsent(ctx context.Context) (*message.Message
 }
 
 func messageFromRow(res gen.GetNextUnsentRow) (*message.Message, error) {
-	return message.NewMessage(strID(res.ID), message.PhoneNumber(res.Recipient), res.Content)
+	return message.NewMessage(strID(res.ID), res.Recipient, res.Content)
 }
 
 func strID(id int32) string {
@@ -79,7 +79,7 @@ func (m *MessageRepository) GetAllSent(ctx context.Context) ([]*message.SentMess
 
 func (m *MessageRepository) Insert(ctx context.Context, msg *message.Message) error {
 	if err := m.queries.InsertMessage(ctx, gen.InsertMessageParams{
-		Recipient: string(msg.To),
+		Recipient: msg.To,
 		Content:   msg.Content,
 	}); err != nil {
 		return errors.Wrap(err, "inserting message")
@@ -126,7 +126,7 @@ func (m *MessageRepository) GetAllUnsent(ctx context.Context) ([]*message.Messag
 func unsentMessagesFromRows(res []gen.GetAllUnsentRow) ([]*message.Message, error) {
 	ret := make([]*message.Message, len(res))
 	for i, r := range res {
-		msg, err := message.NewMessage(strID(r.ID), message.PhoneNumber(r.Recipient), r.Content)
+		msg, err := message.NewMessage(strID(r.ID), r.Recipient, r.Content)
 		if err != nil {
 			return nil, errors.Wrap(err, "creating message from row")
 		}

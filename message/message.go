@@ -16,10 +16,8 @@ var (
 	ErrNegativeCharacterLimit = errors.New("negative character limit")
 )
 
-type PhoneNumber string
-
-func (p *PhoneNumber) validate() error {
-	if !e164PhoneRegex.MatchString(string(*p)) {
+func validatePhone(num string) error {
+	if !e164PhoneRegex.MatchString(num) {
 		return ErrInvalidPhoneNumber
 	}
 	return nil
@@ -27,17 +25,17 @@ func (p *PhoneNumber) validate() error {
 
 type Message struct {
 	ID        string
-	To        PhoneNumber `json:"to"`
+	To        string
 	Content   string
 	MessageID string
 	SentAt    time.Time
 }
 
-func NewMessage(id string, to PhoneNumber, content string) (*Message, error) {
+func NewMessage(id, to, content string) (*Message, error) {
 	if id == "" {
 		return nil, ErrBlankID
 	}
-	if err := to.validate(); err != nil {
+	if err := validatePhone(to); err != nil {
 		return nil, err
 	}
 	return &Message{
