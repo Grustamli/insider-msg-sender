@@ -52,9 +52,7 @@ func run() error {
 
 	app := logging.LogApplicationAccess(application.NewApplication(messages, sender), log)
 
-	if err := app.SendAllUnsent(ctx); err != nil {
-		return err
-	}
+	go sendAllUnsentMessages(ctx, app, log)
 
 	msgSenderDaemon := initMessageSenderDaemon(cfg, app, log)
 	if err := msgSenderDaemon.Start(ctx); err != nil {
@@ -62,6 +60,12 @@ func run() error {
 	}
 	srv := initAPIServer(app, msgSenderDaemon)
 	return srv.Run()
+}
+
+func sendAllUnsentMessages(ctx context.Context, app *logging.Application, log zerolog.Logger) {
+	if err := app.SendAllUnsent(ctx); err != nil {
+		log.Error().Err(err).Msg("Failed to send all unsent messages")
+	}
 }
 
 func initLogger(cfg *config.AppConfig) zerolog.Logger {
