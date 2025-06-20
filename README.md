@@ -45,7 +45,7 @@ Swagger API docs can be accessed at `http://localhost:8000/swagger/index.html`
 ## CLI
 
 Single `seed` command is written to seed the database with given count `-c` per `-i` interval.
-It is used in the docker-compose as `seeder` service to initialize and continuously seed the db with fake messages
+It is used in the docker-compose as `seeder` service to initialize and continuously seed the db with fake messages.
 See the examples below
 
 ```bash
@@ -60,17 +60,17 @@ DATABASE_URL="postgres://postgres:password@localhost:5432/postgres" /cli seed -c
 
 ## Tech stack
 
-- **Postgresql**: stores messsages
+- **Postgresql**: stores messages
 - **Redis**: caches sent messages
 
 ## Used libraries
 
 - `github.com/alecthomas/kong`: lightweight library to build CLIs
 - `github.com/gin-gonic/gin`: REST API framework
-- `github.com/pkg/errors`: Used primarily to wrapp errors
+- `github.com/pkg/errors`: Used primarily to wrap errors
 - `github.com/redis/go-redis/v9`: Redis client for go
 - `github.com/rs/zerolog`: Logger library
-- `github.com/sethvargo/go-envconfig`: Automatic logging and parsing of config from environment
+- `github.com/sethvargo/go-envconfig`: Automatic loading and parsing of config from environment
 
 ## Notes
 
