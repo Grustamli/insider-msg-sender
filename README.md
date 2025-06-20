@@ -61,3 +61,7 @@ DATABASE_URL="postgres://postgres:password@localhost:5432/postgres" /cli seed -c
 - `github.com/redis/go-redis/v9`: Redis client for go
 - `github.com/rs/zerolog`: Logger library
 - `github.com/sethvargo/go-envconfig`: Automatic logging and parsing of config from environment
+
+## Notes
+
+- Used ChatGPT for most of the comments
