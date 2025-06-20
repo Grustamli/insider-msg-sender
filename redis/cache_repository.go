@@ -3,9 +3,9 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"github.com/grustamli/insider-msg-sender/message"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
-	"insider-message-sender/message"
 )
 
 type CacheRepository struct {

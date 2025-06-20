@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/grustamli/insider-msg-sender/message"
+	"github.com/grustamli/insider-msg-sender/postgres/gen"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
-	"insider-message-sender/message"
-	"insider-message-sender/postgres/gen"
 	"strconv"
 )
 

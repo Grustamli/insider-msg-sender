@@ -2,8 +2,8 @@ package application
 
 import (
 	"context"
+	"github.com/grustamli/insider-msg-sender/message"
 	"github.com/pkg/errors"
-	"insider-message-sender/message"
 	"time"
 )
 

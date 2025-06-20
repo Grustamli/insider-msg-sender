@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"insider-message-sender/message"
+	"github.com/grustamli/insider-msg-sender/message"
 	"net/http"
 	"time"
 )

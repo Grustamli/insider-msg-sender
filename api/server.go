@@ -2,9 +2,14 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"insider-message-sender/application"
-	"insider-message-sender/daemon"
+	"github.com/grustamli/insider-msg-sender/application"
+	"github.com/grustamli/insider-msg-sender/daemon"
+	docs "github.com/grustamli/insider-msg-sender/docs"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @BasePath /
 
 type Server struct {
 	app       application.App
@@ -21,6 +26,7 @@ func NewServer(router *gin.Engine, port string, app application.App, scheduler d
 		port:      port,
 	}
 	s.initHandlers()
+	s.registerSwagger()
 	return s
 }
 
@@ -32,4 +38,9 @@ func (s *Server) initHandlers() {
 	s.router.POST("/start", s.startSender)
 	s.router.POST("/stop", s.stopSender)
 	s.router.GET("/sent-messages", s.listSentMessages)
+}
+
+func (s *Server) registerSwagger() {
+	docs.SwaggerInfo.BasePath = "/"
+	s.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }

@@ -2,9 +2,9 @@ package logging
 
 import (
 	"context"
+	"github.com/grustamli/insider-msg-sender/application"
+	"github.com/grustamli/insider-msg-sender/message"
 	"github.com/rs/zerolog"
-	"insider-message-sender/application"
-	"insider-message-sender/message"
 )
 
 type Application struct {
