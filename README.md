@@ -22,6 +22,16 @@ Run docker compose file
 docker compose up -d
 ```
 
+## Configuration
+
+- `WEBHOOK_URL`: Required. Webhook URL to send the messages
+- `DB_PASSWORD`: Required. Postgres DB Password
+- `WEBHOOK_AUTH_HEADER`: Optional. Used when Webhook required auth with header. Must accompany WEBHOOK_AUTH_KEY.
+- `WEBHOOK_AUTH_KEYl`: Optional. Used when Webhook required auth with header. Must accompany WEBHOOK_AUTH_HEADER.
+- `WEBHOOK_CHARACTER_LIMIT`: Default limit is 160 characters
+- `SEND_INTERVAL_SECONDS`: Number of seconds until the next send starts
+- `MESSAGE_COUNT_PER_INTERVAL`: Number of messages to send each interval
+
 ## API endpoints
 
 API runs on `http://localhost:8000`
