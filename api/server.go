@@ -5,6 +5,7 @@ import (
 	"github.com/grustamli/insider-msg-sender/application"
 	"github.com/grustamli/insider-msg-sender/daemon"
 	docs "github.com/grustamli/insider-msg-sender/docs"
+	"github.com/rs/zerolog"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -26,15 +27,18 @@ type Server struct {
 	scheduler daemon.Daemon
 	router    *gin.Engine
 	port      string
+	log       zerolog.Logger
 }
 
-func NewServer(router *gin.Engine, port string, app application.App, scheduler daemon.Daemon) *Server {
+func NewServer(router *gin.Engine, port string, app application.App, scheduler daemon.Daemon, log zerolog.Logger) *Server {
 	s := &Server{
 		router:    router,
 		app:       app,
 		scheduler: scheduler,
 		port:      port,
+		log:       log,
 	}
+	s.initMiddleware()
 	s.initHandlers()
 	s.registerSwagger()
 	return s
@@ -42,6 +46,14 @@ func NewServer(router *gin.Engine, port string, app application.App, scheduler d
 
 func (s *Server) Run() error {
 	return s.router.Run(s.port)
+}
+
+func (s *Server) initMiddleware() {
+	s.router.Use(
+		RequestID(),
+		Logger(s.log),
+		gin.Recovery(),
+	)
 }
 
 func (s *Server) initHandlers() {

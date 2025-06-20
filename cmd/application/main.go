@@ -58,7 +58,7 @@ func run() error {
 	if err := msgSenderDaemon.Start(ctx); err != nil {
 		return err
 	}
-	srv := initAPIServer(app, msgSenderDaemon)
+	srv := initAPIServer(app, msgSenderDaemon, log)
 	return srv.Run()
 }
 
@@ -100,7 +100,7 @@ func initDB(cfg *config.AppConfig) (*sql.DB, error) {
 }
 
 func initMessageSender(cfg *config.AppConfig) (*webhook.MessageSender, error) {
-	client := initHTTPClient(&cfg.Webhook)
+	client := &http.Client{Timeout: time.Second * time.Duration(cfg.Webhook.TimeoutSeconds)}
 	ret, err := webhook.NewWebhookSender(client, cfg.Webhook.URL, buildWebhookOpts(&cfg.Webhook)...)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating webhook sender")
@@ -120,11 +120,6 @@ func buildWebhookOpts(cfg *config.WebhookConfig) []webhook.OptFunc {
 	return ret
 }
 
-func initHTTPClient(cfg *config.WebhookConfig) *http.Client {
-	client := &http.Client{Timeout: time.Second * time.Duration(cfg.TimeoutSeconds)}
-	return client
-}
-
 func initMessageSenderDaemon(cfg *config.AppConfig, app application.App, logger zerolog.Logger) *daemon.TimerDaemon {
 	return daemon.NewTimerDaemon("MessageSender", func(ctx context.Context) error {
 		for i := 0; i < cfg.MessageCountPerInterval; i++ {
@@ -136,6 +131,6 @@ func initMessageSenderDaemon(cfg *config.AppConfig, app application.App, logger 
 	}, time.Duration(cfg.SendIntervalSeconds)*time.Second, &logger)
 }
 
-func initAPIServer(app application.App, msgSenderDaemon daemon.Daemon) *api.Server {
-	return api.NewServer(gin.Default(), ":8000", app, msgSenderDaemon)
+func initAPIServer(app application.App, msgSenderDaemon daemon.Daemon, log zerolog.Logger) *api.Server {
+	return api.NewServer(gin.Default(), ":8000", app, msgSenderDaemon, log)
 }
