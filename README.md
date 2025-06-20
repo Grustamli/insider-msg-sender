@@ -7,7 +7,7 @@ An application that sends messages retrieved from database periodically to a web
 Clone this repository
 
 ```bash
-git clone https://github.com/Grustamli/insider-msg-sender.git --depth 1
+git clone https://github.com/Grustamli/insider-msg-sender.git --depth 1 && cd ./insider-msg-sender
 ```
 
 Rename the included `.env.example` file to `.env`
