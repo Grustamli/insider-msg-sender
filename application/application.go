@@ -15,12 +15,12 @@ type App interface {
 
 type Application struct {
 	messages message.Repository
-	sender   message.MessageSender
+	sender   message.Sender
 }
 
 var _ App = (*Application)(nil)
 
-func NewApplication(messages message.Repository, sender message.MessageSender) *Application {
+func NewApplication(messages message.Repository, sender message.Sender) *Application {
 	return &Application{
 		messages: messages,
 		sender:   sender,

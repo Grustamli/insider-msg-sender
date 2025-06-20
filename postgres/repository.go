@@ -1,3 +1,4 @@
+// Package postgres implements the message.Repository interface for PostgreSQL storage.
 package postgres
 
 import (
@@ -17,12 +18,15 @@ type MessageRepository struct {
 
 var _ message.Repository = (*MessageRepository)(nil)
 
+// NewMessageRepository constructs a new PostgreSQL implementation of message.Repository
 func NewMessageRepository(queries *gen.Queries) *MessageRepository {
 	return &MessageRepository{
 		queries: queries,
 	}
 }
 
+// GetNextUnsent retrieves the next unsent message from the database.
+// Returns nil, nil if no unsent message is found.
 func (m *MessageRepository) GetNextUnsent(ctx context.Context) (*message.Message, error) {
 	res, err := m.queries.GetNextUnsent(ctx)
 	if err != nil {
@@ -34,14 +38,18 @@ func (m *MessageRepository) GetNextUnsent(ctx context.Context) (*message.Message
 	return messageFromRow(res)
 }
 
+// messageFromRow converts a GetNextUnsentRow to a message.Message.
 func messageFromRow(res gen.GetNextUnsentRow) (*message.Message, error) {
 	return message.NewMessage(strID(res.ID), res.Recipient, res.Content)
 }
 
+// strID formats an integer ID as its string representation.
 func strID(id int32) string {
 	return fmt.Sprintf("%d", id)
 }
 
+// Save updates the sent status of a message in the database including message_id and sent_at.
+// Does nothing if SentAt is zero. Returns an error if the ID is missing or update fails.
 func (m *MessageRepository) Save(ctx context.Context, msg *message.Message) error {
 	// if message is not set sent don't do any action
 	if msg.SentAt.IsZero() {
@@ -66,6 +74,8 @@ func (m *MessageRepository) Save(ctx context.Context, msg *message.Message) erro
 	return nil
 }
 
+// GetAllSent retrieves all sent messages from the database.
+// Returns nil, nil if no sent messages are found.
 func (m *MessageRepository) GetAllSent(ctx context.Context) ([]*message.SentMessage, error) {
 	res, err := m.queries.GetAllSent(ctx)
 	if err != nil {
@@ -77,6 +87,7 @@ func (m *MessageRepository) GetAllSent(ctx context.Context) ([]*message.SentMess
 	return sentMessagesFromRows(res)
 }
 
+// Insert adds a new unsent message record to the database.
 func (m *MessageRepository) Insert(ctx context.Context, msg *message.Message) error {
 	if err := m.queries.InsertMessage(ctx, gen.InsertMessageParams{
 		Recipient: msg.To,
@@ -87,6 +98,7 @@ func (m *MessageRepository) Insert(ctx context.Context, msg *message.Message) er
 	return nil
 }
 
+// sentMessagesFromRows maps a slice of GetAllSentRow to domain message.SentMessage objects.
 func sentMessagesFromRows(res []gen.GetAllSentRow) ([]*message.SentMessage, error) {
 	ret := make([]*message.SentMessage, len(res))
 	for i, r := range res {
@@ -99,6 +111,8 @@ func sentMessagesFromRows(res []gen.GetAllSentRow) ([]*message.SentMessage, erro
 	return ret, nil
 }
 
+// sentMessageFromRow converts a GetAllSentRow to a domain message.SentMessage.
+// Returns an error if the row has invalid timestamps or message IDs.
 func sentMessageFromRow(r gen.GetAllSentRow) (*message.SentMessage, error) {
 	if !r.SentAt.Valid {
 		return nil, fmt.Errorf("invalid sent timestamp, %v", r.SentAt.Time)
@@ -112,6 +126,8 @@ func sentMessageFromRow(r gen.GetAllSentRow) (*message.SentMessage, error) {
 	}, nil
 }
 
+// GetAllUnsent retrieves all unsent messages from the database.
+// Returns nil, nil if no unsent messages are found.
 func (m *MessageRepository) GetAllUnsent(ctx context.Context) ([]*message.Message, error) {
 	res, err := m.queries.GetAllUnsent(ctx)
 	if err != nil {
@@ -123,6 +139,7 @@ func (m *MessageRepository) GetAllUnsent(ctx context.Context) ([]*message.Messag
 	return unsentMessagesFromRows(res)
 }
 
+// unsentMessagesFromRows maps a slice of GetAllUnsentRow to domain Message objects.
 func unsentMessagesFromRows(res []gen.GetAllUnsentRow) ([]*message.Message, error) {
 	ret := make([]*message.Message, len(res))
 	for i, r := range res {
