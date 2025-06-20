@@ -57,7 +57,10 @@ func (c *CacheRepository) GetAllSent(ctx context.Context) ([]*message.SentMessag
 }
 
 func (c *CacheRepository) saveMessageToCache(ctx context.Context, msg *message.Message) error {
-	msgJson, err := json.Marshal(msg)
+	msgJson, err := json.Marshal(&message.SentMessage{
+		MessageID: msg.MessageID,
+		SentAt:    msg.SentAt,
+	})
 	if err != nil {
 		return err
 	}
