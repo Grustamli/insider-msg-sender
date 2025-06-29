@@ -23,7 +23,7 @@ docker compose -f ./docker-compose.yml -f ./docker-compose.w-seeder.yml up -d
 ```
 
 **Note**: Make sure the `WEBHOOK_URL` env variable is up to date webhook.site url with proper response settings as
-described in the task file, `Gadir Rustamli.docx`
+described in the task file.
 
 ## Running integration tests
 
