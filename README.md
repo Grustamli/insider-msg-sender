@@ -57,7 +57,10 @@ Swagger API docs can be accessed at `http://localhost:8000/swagger/index.html`
 
 Single `seed` command is written to seed the database with given count `-c` per `-i` interval.
 It is used in the docker-compose as `seeder` service to initialize and continuously seed the db with fake messages.
-See the examples below
+See the examples below.
+
+**Note**: The CLI is only intended for internal use. I needed to write a seeder to run as a separate service.
+Also, I kind of wrote this to showcase subset of my skills. So, don't worry if you don't find a use for the CLI.
 
 ```bash
 
