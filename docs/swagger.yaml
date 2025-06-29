@@ -1,0 +1,107 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  api.ListSentMessagesResponse:
+    properties:
+      items:
+        description: items is the array of messages that have been sent.
+        items:
+          $ref: '#/definitions/api.MessageOut'
+        type: array
+    type: object
+  api.MessageOut:
+    properties:
+      id:
+        type: string
+      sent_at:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: gadir.rustamli@outlook.com
+    name: Gadir Rustamli
+  description: API endpoints for the Insider Message Sender that periodically sends
+    messages from DB
+  title: Insider Message Sender API
+  version: "1.0"
+paths:
+  /messages:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all messages that have been sent, including their IDs
+        and timestamps.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ListSentMessagesResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List sent messages
+      tags:
+      - Scheduler
+  /start:
+    post:
+      consumes:
+      - application/json
+      description: Initiates the scheduler to begin sending messages at configured
+        intervals.
+      operationId: startSender
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Start message sender
+      tags:
+      - Scheduler
+  /stop:
+    post:
+      consumes:
+      - application/json
+      description: Halts the scheduler, stopping any further message dispatch until
+        restarted.
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Stop the message sender
+      tags:
+      - Scheduler
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
+tags:
+- name: Scheduler

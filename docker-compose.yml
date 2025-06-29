@@ -1,0 +1,66 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - WEBHOOK_URL
+      - WEBHOOK_AUTH_HEADER
+      - WEBHOOK_AUTH_KEY
+      - WEBHOOK_CHARACTER_LIMIT=160
+      - WEBHOOK_TIMEOUT_SECONDS=20
+      - SEND_INTERVAL_SECONDS=120
+      - MESSAGE_COUNT_PER_INTERVAL=2
+      - REDIS_ADDRESS=redis:6379
+      - REDIS_CACHE_KEY=messages
+      - POSTGRES_DB_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
+
+  db:
+    image: postgres:16.9-alpine3.22
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5434}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+  migrator:
+    image: arigaio/atlas:latest-community-alpine
+    entrypoint: [ ]
+    command: sh -c "atlas migrate apply --url postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable --dir file:///migrations && tail -f /dev/null"
+
+    volumes:
+      - ./postgres/migrations:/migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL",
+        "atlas migrate status \
+          --dir file:///migrations \
+          --url \"postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable\" \
+        | grep -q '^Migration Status: OK'" ]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+    restart: "no"
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+volumes:
+  db_data:

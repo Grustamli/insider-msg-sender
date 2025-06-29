@@ -1,0 +1,17 @@
+services:
+  seeder:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@db:5432/postgres?sslmode=disable
+    command: >
+      sh -c "
+        echo 'Seeding initial messages...' &&
+        /bin/cli seed -c 10 &&
+        echo 'Running periodic seeder...' &&
+        /bin/cli seed -c 1 -i 10
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_healthy
